@@ -17,7 +17,7 @@ function mergeClaude(base, ai) {
     const key = String(it.label).toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    base.categories.inclusive.push({ status: "issue", label: it.label, detail: it.detail || "", topic: it.topic || "", source: "ai" });
+    base.categories.inclusive.push({ status: "issue", label: it.label, detail: it.detail || "", topic: it.topic || "", match: it.label, source: "ai" });
     added++;
   }
   for (const it of ai.clarity || []) if (it && it.label) base.categories.clarity.push({ status: "warn", label: it.label, detail: it.detail || "", source: "ai" });
