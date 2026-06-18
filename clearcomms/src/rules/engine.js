@@ -112,21 +112,23 @@ function analyze(text, opts = {}) {
   const longs = text.split(/(?<=[.!?])\s+/).filter((s) => s.split(/\s+/).filter((w) => /[a-z]/i.test(w)).length > THRESHOLDS.longSentenceWords);
   if (longs.length) res.categories.clarity.push({ status: "warn", label: longs.length + " long sentence" + (longs.length > 1 ? "s" : ""), detail: "Sentences over " + THRESHOLDS.longSentenceWords + " words are hard to follow. Try splitting them.", auto: false });
   for (const j of findKeys(text, JARGON)) {
-    res.categories.clarity.push({ status: "warn", label: "“" + j.match + "”", detail: "Plainer option: “" + JARGON[j.key] + "”.", fix: [j.match, JARGON[j.key]], auto: true });
+    res.categories.clarity.push({ status: "warn", label: "“" + j.match + "”", detail: "Plainer option: “" + JARGON[j.key] + "”.", fix: [j.match, JARGON[j.key]], match: j.match, auto: true });
   }
 
   // ---- Inclusive language ----
   const incHits = INCLUSIVE.filter((it) => new RegExp("\\b" + escapeRegExp(it.find) + "\\b", "i").test(text));
   for (const it of incHits) {
-    res.categories.inclusive.push({ status: "issue", label: "“" + it.find + "”", detail: it.reason + " Try: “" + it.suggest + "”.", topic: it.topic, fix: it.noauto ? null : [it.find, it.suggest], auto: !it.noauto });
+    const m = new RegExp("\\b" + escapeRegExp(it.find) + "\\b", "i").exec(text);
+    res.categories.inclusive.push({ status: "issue", label: "“" + it.find + "”", detail: it.reason + " Try: “" + it.suggest + "”.", topic: it.topic, fix: it.noauto ? null : [it.find, it.suggest], match: m ? m[0] : it.find, auto: !it.noauto });
   }
   const banned = Array.isArray(brand.bannedWords) ? brand.bannedWords : [];
   let bannedHits = 0;
   for (const w of banned) {
     if (!w) continue;
-    if (new RegExp("\\b" + escapeRegExp(String(w)) + "\\b", "i").test(text)) {
+    const bm = new RegExp("\\b" + escapeRegExp(String(w)) + "\\b", "i").exec(text);
+    if (bm) {
       bannedHits++;
-      res.categories.inclusive.push({ status: "issue", label: "“" + w + "”", detail: "On your organisation's banned-words list.", topic: "Brand", auto: false });
+      res.categories.inclusive.push({ status: "issue", label: "“" + w + "”", detail: "On your organisation's banned-words list.", topic: "Brand", match: bm[0], auto: false });
     }
   }
   if (!res.categories.inclusive.length) res.categories.inclusive.push({ status: "good", label: "No flagged language found", detail: "Nothing matched the sensitive-language list. A human check is still wise." });
@@ -138,13 +140,14 @@ function analyze(text, opts = {}) {
   else if (hashtags.length) res.categories.accessibility.push({ status: "good", label: "Hashtags look accessible", detail: "CamelCase hashtags read correctly aloud." });
 
   const caps = (text.match(/\b[A-Z][A-Z'&]{2,}\b/g) || []).filter((w) => !ACRONYM_SET.has(w.replace(/[^A-Z]/g, "")));
-  if (caps.length) res.categories.accessibility.push({ status: "warn", label: "Avoid SHOUTING in capitals", detail: "Screen readers may spell out “" + caps[0] + "” letter by letter. The rewrite switches these to sentence case.", auto: true });
+  if (caps.length) res.categories.accessibility.push({ status: "warn", label: "Avoid SHOUTING in capitals", detail: "Screen readers may spell out “" + caps[0] + "” letter by letter. The rewrite switches these to sentence case.", matches: caps, auto: true });
 
   const emoji = text.match(/\p{Extended_Pictographic}/gu) || [];
   const repeat = /(\p{Extended_Pictographic})\1/u.test(text);
   if (emoji.length > THRESHOLDS.maxEmoji || repeat) res.categories.accessibility.push({ status: "warn", label: "Go easy on emoji", detail: "Each emoji is read aloud, and repeats get repeated. Use one or two, at the end.", auto: false });
 
-  if (/\bclick here\b/i.test(text) || /\bclick the link\b/i.test(text)) res.categories.accessibility.push({ status: "warn", label: "Replace “click here”", detail: "Describe where the link goes, e.g. “read our support guide”.", fix: ["click here", "read more about it"], auto: true });
+  const clickM = /\bclick here\b/i.exec(text) || /\bclick the link\b/i.exec(text);
+  if (clickM) res.categories.accessibility.push({ status: "warn", label: "Replace “click here”", detail: "Describe where the link goes, e.g. “read our support guide”.", fix: ["click here", "read more about it"], match: clickM[0], auto: true });
 
   if (/[\u{1D400}-\u{1D7FF}]/u.test(text)) res.categories.accessibility.push({ status: "issue", label: "Fancy fonts are unreadable", detail: "Stylised unicode letters are skipped by screen readers. Use standard text.", auto: false });
 
