@@ -100,12 +100,12 @@
   function renderResult(r, checkId, text) {
     lastCheckId = checkId || null;
     const c = r.categories || {};
-    const rc = r.score >= 80 ? "var(--ink)" : r.score >= 60 ? "var(--yellow-d)" : "var(--coral)";
+    const rc = r.score >= 80 ? "var(--green)" : r.score >= 60 ? "var(--yellow-d)" : "var(--issue)";
     const aiFlag = r.aiUsed ? '<span class="aiflag on">AI review</span>' : '<span class="aiflag off">Rules only</span>';
-    let html = `<div class="score"><div class="num" style="color:${rc}">${r.score}<span class="slash">/100</span></div>`
+    let html = `<div class="score"><div class="score-ring" style="--p:${r.score};--rc:${rc}"><span class="cap"></span><span class="val"><b>${r.score}</b><small>/100</small></span></div>`
       + `<div class="verdict"><div class="band" style="color:${rc}">${esc(r.band)}</div>`
       + `<div class="vtext">${r.summary ? esc(r.summary) : "Reading age about " + esc(r.readingAge) + ", aim for 9 to 11."}</div>`
-      + `<div class="underline-coral" style="background:${rc}"></div>${aiFlag}</div></div>`;
+      + `${aiFlag}</div></div>`;
 
     const mk = buildMarkup(text, c);
     if (mk.count) html += `<div class="markup"><span class="cap ttl">Your post, marked up</span>${mk.html}</div>`;
