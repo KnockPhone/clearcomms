@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClearComms — clear, kind, accessible comms</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#auth">Skip to sign in</a>
+<header class="topbar">
+  <a class="brand" href="/"><span class="mark" aria-hidden="true">C</span> ClearComms</a>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="eyebrow">Public sector · health · charity comms</span>
+    <h1>Write comms that are <span class="hl">clear, kind</span> and accessible.</h1>
+    <p>Check any social post for plain English, accessibility and non-stigmatising language before it goes live. Built for the teams who can't afford to get the words wrong.</p>
+    <div class="pills">
+      <span>Plain-English scoring</span><span>Non-stigmatising language</span><span>Accessibility checks</span><span>Natural rewrites</span>
+    </div>
+  </section>
+
+  <section class="feature-row" aria-label="What ClearComms does">
+    <div class="feature"><div class="ic" aria-hidden="true">Aa</div><b>Plain English</b><span>Reading-age scoring with specific, usable rewrites.</span></div>
+    <div class="feature"><div class="ic" aria-hidden="true">&#9829;</div><b>Inclusive language</b><span>Catches stigmatising wording on sensitive health topics.</span></div>
+    <div class="feature"><div class="ic" aria-hidden="true">&#10003;</div><b>Accessibility</b><span>Hashtags, capitals, emoji, link text and alt-text prompts.</span></div>
+  </section>
+
+  <section class="authcard" id="auth" aria-label="Sign up or log in">
+    <div class="tabs" role="tablist">
+      <button id="tab-signup" role="tab" aria-selected="true" aria-controls="form-signup" type="button">Create account</button>
+      <button id="tab-login" role="tab" aria-selected="false" aria-controls="form-login" type="button">Log in</button>
+    </div>
+
+    <form id="form-signup" novalidate>
+      <h2>Start checking in minutes</h2>
+      <label for="su-org">Organisation name</label>
+      <input id="su-org" name="orgName" autocomplete="organization" required>
+      <label for="su-email">Work email</label>
+      <input id="su-email" name="email" type="email" autocomplete="email" required>
+      <label for="su-pass">Password (at least 8 characters)</label>
+      <input id="su-pass" name="password" type="password" autocomplete="new-password" minlength="8" required>
+      <p class="error" id="su-error" role="alert" aria-live="polite"></p>
+      <button class="btn btn-primary btn-lg" type="submit" style="width:100%;margin-top:6px">Create account</button>
+    </form>
+
+    <form id="form-login" novalidate hidden>
+      <h2>Welcome back</h2>
+      <label for="li-email">Email</label>
+      <input id="li-email" name="email" type="email" autocomplete="email" required>
+      <label for="li-pass">Password</label>
+      <input id="li-pass" name="password" type="password" autocomplete="current-password" required>
+      <p class="error" id="li-error" role="alert" aria-live="polite"></p>
+      <button class="btn btn-primary btn-lg" type="submit" style="width:100%;margin-top:6px">Log in</button>
+    </form>
+  </section>
+
+  <p class="foot">Assistive only. Keep a human in the loop before publishing.</p>
+</main>
+
+<script src="/auth.js"></script>
+</body>
+</html>

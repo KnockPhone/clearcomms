@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClearComms</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#draft">Skip to the editor</a>
+<header class="topbar">
+  <a class="brand" href="/app"><span class="mark" aria-hidden="true">C</span> ClearComms</a>
+  <div class="spacer"></div>
+  <span class="chip-pill" id="usage" aria-live="polite"></span>
+  <span class="who" id="who"></span>
+  <button class="btn btn-primary" id="upgrade" hidden>Upgrade</button>
+  <button class="btn btn-ghost" id="manage" hidden>Billing</button>
+  <button class="btn btn-ghost" id="settings-btn">Settings</button>
+  <button class="btn btn-ghost" id="logout">Log out</button>
+</header>
+
+<main class="wrap">
+  <div id="upgrade-banner" class="banner" hidden></div>
+
+  <div class="appgrid">
+    <section class="panel" aria-label="Editor">
+      <h2>Your draft</h2>
+      <label for="draft">Post text</label>
+      <textarea id="draft" rows="9" placeholder="Paste a social post or short piece of content here..."></textarea>
+      <div class="row">
+        <div>
+          <label for="platform">Platform</label>
+          <select id="platform"><option>LinkedIn</option><option>X</option><option>Instagram</option><option>Facebook</option></select>
+        </div>
+        <div class="grow">
+          <label for="profile">Brand profile</label>
+          <select id="profile"><option value="">None</option></select>
+        </div>
+        <button class="btn btn-primary btn-lg" id="check">Check post</button>
+        <span class="count" id="count">0 characters</span>
+      </div>
+      <div class="chips">
+        <span class="lbl">Try an example:</span>
+        <button class="chip" data-sample="0" type="button">Mental health</button>
+        <button class="chip" data-sample="1" type="button">Stop smoking</button>
+        <button class="chip" data-sample="2" type="button">Sexual health</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Results">
+      <h2>Results</h2>
+      <div id="results" aria-live="polite"><div class="empty"><span class="big" aria-hidden="true">&#9678;</span>Paste a draft on the left and select Check post.</div></div>
+    </section>
+  </div>
+
+  <div class="appgrid">
+    <section class="panel" aria-label="Recent checks">
+      <h2>Recent checks</h2>
+      <ul class="list" id="history"></ul>
+    </section>
+
+    <section class="panel" aria-label="Brand profiles">
+      <h2>Brand profiles</h2>
+      <ul class="list" id="profiles-list"></ul>
+      <form id="bp-form" style="margin-top:10px">
+        <label for="bp-name">Name</label>
+        <input id="bp-name" required placeholder="e.g. Council main channel">
+        <label for="bp-tone">Tone notes (optional)</label>
+        <input id="bp-tone" placeholder="warm, plain, reassuring">
+        <label for="bp-banned">Banned words (comma separated, optional)</label>
+        <input id="bp-banned" placeholder="utilise, leverage, synergy">
+        <label for="bp-age">Reading age target (optional)</label>
+        <input id="bp-age" type="number" min="5" max="18" placeholder="11">
+        <p class="error" id="bp-error" role="alert" aria-live="polite"></p>
+        <button class="btn btn-ghost" type="submit" style="margin-top:10px">Add profile</button>
+      </form>
+    </section>
+  </div>
+
+  <p class="foot">Assistive only. A human should review before publishing. AI reviews are powered by Claude when configured.</p>
+</main>
+
+<dialog id="setup-dialog" aria-labelledby="setup-title">
+  <h2 id="setup-title" style="margin:0 0 4px;font-size:21px">Connect Claude</h2>
+  <p class="muted" style="margin:0 0 14px;font-size:14px">Paste your Anthropic API key to switch on AI-powered checks and natural rewrites. It is stored encrypted on your own server and is never shown again. Without it, ClearComms still runs on the built-in rules.</p>
+  <form id="setup-form">
+    <label for="set-key">Anthropic API key</label>
+    <input id="set-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
+    <label for="set-model">Model</label>
+    <select id="set-model">
+      <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (recommended)</option>
+      <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (cheapest)</option>
+      <option value="claude-opus-4-8">Claude Opus 4.8 (most capable)</option>
+    </select>
+    <p class="error" id="set-error" role="alert" aria-live="polite"></p>
+    <div class="row" style="margin-top:10px">
+      <button class="btn btn-primary" type="submit">Save and turn on AI</button>
+      <button class="btn btn-ghost" type="button" id="setup-skip">Not now</button>
+    </div>
+    <p class="muted" id="set-envnote" style="font-size:12.5px;margin-top:12px" hidden>A key is already configured on the server, so this is managed there.</p>
+  </form>
+</dialog>
+
+<div class="flash" id="flash" role="status" aria-live="polite"></div>
+<script src="/app.js"></script>
+</body>
+</html>
