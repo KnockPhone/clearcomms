@@ -35,19 +35,39 @@
     return `<div class="cat"><h3><span class="dot" style="background:${color}"></span>${title} <span class="n">(${arr.length})</span></h3>${itemsHtml(arr, aiUsed)}</div>`;
   }
 
+  // The specific reasoning behind THIS rewrite: every change that was applied,
+  // each paired with why. This sits next to the standing "Our method" panel,
+  // which explains the principles in general.
+  function changesBlock(r) {
+    const c = r.categories || {};
+    const all = [].concat(c.inclusive || [], c.clarity || [], c.accessibility || [], c.tone || []);
+    const applied = all.filter((it) => (it.status === "warn" || it.status === "issue") && (r.aiUsed || it.auto !== false));
+    let body;
+    if (!applied.length) {
+      body = `<p class="changes-empty">Nothing needed changing. This draft already reads clearly, kindly and accessibly.</p>`;
+    } else {
+      body = `<ul class="changes-list">` + applied.slice(0, 8).map((it) =>
+        `<li><span class="changes-what">${esc(it.label)}</span><span class="changes-why">${esc(it.detail)}</span></li>`
+      ).join("") + `</ul>`;
+      if (applied.length > 8) body += `<p class="muted" style="font-size:12.5px;margin:8px 0 0">and ${applied.length - 8} more in the findings above.</p>`;
+    }
+    return `<div class="changes"><h3>What changed, and why</h3>${body}</div>`;
+  }
+
   function renderResult(r, checkId) {
     lastCheckId = checkId || null;
     const c = r.categories || {};
-    const rc = r.score >= 80 ? "var(--good)" : r.score >= 60 ? "var(--warn)" : "var(--issue)";
     const aiFlag = r.aiUsed ? '<span class="aiflag on">AI review</span>' : '<span class="aiflag off">Rules only</span>';
-    let html = `<div class="scorewrap"><div class="ring" style="--p:${r.score};--rc:${rc}"><div class="inner"><b>${r.score}</b><small>score</small></div></div>`
-      + `<div class="scoremeta"><span class="band" style="background:${rc}">${esc(r.band)}</span>${aiFlag}<div class="sub">Reading age about ${esc(r.readingAge)} · aim for 9 to 11</div><div class="sub">${esc(r.words)} words · ${esc(r.sentences)} sentences</div></div></div>`;
+    let html = `<div class="scorewrap"><div class="ring" style="--p:${r.score}"><div class="inner"><b>${r.score}</b><small>/100</small></div></div>`
+      + `<div class="scoremeta"><span class="band">${esc(r.band)}</span>${aiFlag}<div class="sub">Reading age about ${esc(r.readingAge)} · aim for 9 to 11</div><div class="sub">${esc(r.words)} words · ${esc(r.sentences)} sentences</div></div></div>`;
     if (r.summary) html += `<p class="summary">${esc(r.summary)}</p>`;
     html += catBlock("Inclusive language", "#E0413A", c.inclusive || [], r.aiUsed);
     html += catBlock("Clarity and plain English", "#D98324", c.clarity || [], r.aiUsed);
     html += catBlock("Accessibility", "#0FA37F", c.accessibility || [], r.aiUsed);
     html += catBlock("Tone and platform", "#5B7A86", c.tone || [], r.aiUsed);
-    const rwScore = r.rewriteScore != null ? ` <span class="aiflag on">scores ${r.rewriteScore}/100</span>` : "";
+    html += changesBlock(r);
+    const up = r.rewriteScore != null && r.score != null && r.rewriteScore > r.score ? `, up from ${r.score}` : "";
+    const rwScore = r.rewriteScore != null ? ` <span class="aiflag on">scores ${r.rewriteScore}/100${up}</span>` : "";
     html += `<div class="rewrite"><h3>Suggested rewrite${rwScore}</h3>`;
     if (!r.aiUsed) html += `<p class="note">Items tagged “edit manually” above are context-dependent and left for you. Add a Claude API key for fluent rewrites that apply everything.</p>`;
     html += `<textarea id="rw" rows="6">${esc(r.rewrite || "")}</textarea><div class="row"><button class="btn btn-ghost" id="copy-rw">Copy rewrite</button>`;
@@ -206,6 +226,7 @@
       const me = await fetch("/api/auth/me").then((r) => r.json());
       if (!me.user) { window.location.href = "/"; return; }
       $("who").textContent = me.user.org.name;
+      if (me.user.isAdmin) { const al = $("admin-link"); if (al) al.hidden = false; }
     } catch (e) { window.location.href = "/"; return; }
     updateCount(); loadUsage(); loadProfiles(); loadHistory(); loadSettings();
   })();

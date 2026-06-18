@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClearComms admin</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <a class="brand" href="/app"><span class="mark" aria-hidden="true">C</span> ClearComms</a>
+  <span class="chip-pill">Admin</span>
+  <div class="spacer"></div>
+  <span class="who" id="who"></span>
+  <a class="btn btn-ghost" href="/app">Back to app</a>
+  <button class="btn btn-ghost" id="logout">Log out</button>
+</header>
+
+<main class="wrap" id="main">
+  <div class="admin-head">
+    <div>
+      <h1 class="admin-title">Platform admin</h1>
+      <p class="muted" id="admin-sub">Manage every organisation and person using ClearComms.</p>
+    </div>
+    <button class="btn btn-ghost" id="refresh" type="button">Refresh</button>
+  </div>
+
+  <section aria-label="Headline numbers">
+    <div class="stat-grid" id="stats"></div>
+  </section>
+
+  <section class="panel" aria-label="Organisations" style="margin-top:20px">
+    <h2>Organisations <span class="n" id="org-count"></span></h2>
+    <div class="table-wrap">
+      <table class="tbl" id="org-table">
+        <thead><tr><th>Organisation</th><th>Plan</th><th>People</th><th>Checks</th><th>Last active</th><th>Joined</th><th class="ar">Actions</th></tr></thead>
+        <tbody id="org-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="People" style="margin-top:20px">
+    <h2>People <span class="n" id="user-count"></span></h2>
+    <div class="row" style="margin:0 0 6px">
+      <input id="user-search" placeholder="Search by email or organisation" style="max-width:340px" aria-label="Search people">
+    </div>
+    <div class="table-wrap">
+      <table class="tbl" id="user-table">
+        <thead><tr><th>Email</th><th>Organisation</th><th>Role</th><th>Status</th><th>Checks</th><th>Joined</th><th class="ar">Actions</th></tr></thead>
+        <tbody id="user-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="foot">Destructive actions cannot be undone. ClearComms keeps a human in the loop.</p>
+</main>
+
+<div class="flash" id="flash" role="status" aria-live="polite"></div>
+<script src="/admin.js"></script>
+</body>
+</html>
