@@ -12,6 +12,10 @@ const config = {
   env: process.env.NODE_ENV || "development",
   isProd: process.env.NODE_ENV === "production",
   appUrl: process.env.APP_URL || "http://localhost:3000",
+  // The platform administrator. This person sees the admin area and can manage
+  // every organisation and user. If left blank, the first account to sign up is
+  // treated as the administrator, so a fresh install needs no configuration.
+  superAdminEmail: (process.env.SUPER_ADMIN_EMAIL || "").trim().toLowerCase(),
   sessionSecret: process.env.SESSION_SECRET || persistentSecret,
   encryptionKey: crypto.createHash("sha256").update("cc-enc:" + persistentSecret).digest(),
 

@@ -31,6 +31,7 @@ app.use(originCheck);
 app.get("/api/health", (req, res) => res.json({ ok: true, ai: getAiConfig().enabled, billing: config.stripe.enabled }));
 app.use("/api/auth", authLimiter, require("./routes/auth.routes"));
 app.use("/api/billing", require("./routes/billing.routes"));
+app.use("/api/admin", require("./routes/admin.routes"));
 app.use("/api", checkLimiter, require("./routes/api.routes"));
 app.use("/api", (req, res) => res.status(404).json({ error: "Not found" }));
 
@@ -38,6 +39,7 @@ app.use("/api", (req, res) => res.status(404).json({ error: "Not found" }));
 const pub = path.join(__dirname, "public");
 app.use(express.static(pub));
 app.get("/app", (req, res) => res.sendFile(path.join(pub, "app.html")));
+app.get("/admin", (req, res) => res.sendFile(path.join(pub, "admin.html")));
 app.get("/", (req, res) => res.sendFile(path.join(pub, "index.html")));
 
 // eslint-disable-next-line no-unused-vars
