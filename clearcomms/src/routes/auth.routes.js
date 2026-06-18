@@ -2,7 +2,7 @@
 const express = require("express");
 const db = require("../db/index");
 const repo = require("../db/repo");
-const { hashPassword, verifyPassword, startSession, endSession } = require("../auth/auth");
+const { hashPassword, verifyPassword, startSession, endSession, isPlatformAdmin } = require("../auth/auth");
 
 const router = express.Router();
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,6 +11,8 @@ function publicUser(req) {
   if (!req.user) return null;
   return {
     email: req.user.email,
+    role: req.user.role,
+    isAdmin: isPlatformAdmin(req.user),
     org: { id: req.org.id, name: req.org.name, plan: req.org.plan, subscriptionStatus: req.org.subscription_status },
   };
 }

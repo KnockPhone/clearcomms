@@ -113,6 +113,12 @@ router.get("/brand-profiles", (req, res) => res.json({ profiles: repo.listBrandP
 router.post("/brand-profiles", (req, res) => {
   const { name, tone, bannedWords, readingAgeTarget } = req.body || {};
   if (!name || String(name).trim().length < 1) return res.status(400).json({ error: "Please give the profile a name." });
+  // Free includes a single brand profile; Pro removes the limit. This only
+  // bites once billing is configured, so a no-billing instance stays unlimited.
+  const a = allowance(req.org);
+  if (!a.unlimited && repo.listBrandProfiles(req.org.id).length >= 1) {
+    return res.status(402).json({ error: "Free includes one brand profile. Upgrade to Pro for unlimited brand profiles.", upgrade: true });
+  }
   let banned = [];
   if (Array.isArray(bannedWords)) banned = bannedWords.map(String);
   else if (typeof bannedWords === "string") banned = bannedWords.split(",");
