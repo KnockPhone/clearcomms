@@ -4,6 +4,7 @@ const config = require("../config");
 const repo = require("../db/repo");
 const { requireAuth } = require("../auth/auth");
 const { checkText } = require("../services/checker");
+const { altTextForImage } = require("../services/anthropic");
 const { buildReport } = require("../services/report");
 const { getAiConfig } = require("../services/aiConfig");
 const { encrypt } = require("../services/secretbox");
@@ -88,6 +89,23 @@ router.post("/check", async (req, res) => {
   } catch (e) {
     console.error("check failed:", e && e.message);
     res.status(500).json({ error: "The check could not be completed." });
+  }
+});
+
+// ---- Image alt text (Claude vision) ----
+const ALLOWED_MEDIA = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+router.post("/alt-text", async (req, res) => {
+  if (!getAiConfig().enabled) return res.status(503).json({ error: "Turn on AI in Settings to generate alt text.", needsAi: true });
+  const { image, mediaType } = req.body || {};
+  if (typeof image !== "string" || image.length < 50) return res.status(400).json({ error: "Please choose an image." });
+  if (!ALLOWED_MEDIA.includes(mediaType)) return res.status(400).json({ error: "Use a JPEG, PNG, WebP or GIF image." });
+  if (image.length > 1200000) return res.status(413).json({ error: "That image is too large. Try a smaller one." });
+  try {
+    const result = await altTextForImage(image, mediaType);
+    res.json({ result });
+  } catch (e) {
+    console.error("alt-text failed:", e && e.message);
+    res.status(500).json({ error: "Could not read that image. Please try another." });
   }
 });
 
