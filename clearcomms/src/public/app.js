@@ -47,7 +47,8 @@
     html += catBlock("Clarity and plain English", "#D98324", c.clarity || [], r.aiUsed);
     html += catBlock("Accessibility", "#0FA37F", c.accessibility || [], r.aiUsed);
     html += catBlock("Tone and platform", "#5B7A86", c.tone || [], r.aiUsed);
-    html += `<div class="rewrite"><h3>Suggested rewrite</h3>`;
+    const rwScore = r.rewriteScore != null ? ` <span class="aiflag on">scores ${r.rewriteScore}/100</span>` : "";
+    html += `<div class="rewrite"><h3>Suggested rewrite${rwScore}</h3>`;
     if (!r.aiUsed) html += `<p class="note">Items tagged “edit manually” above are context-dependent and left for you. Add a Claude API key for fluent rewrites that apply everything.</p>`;
     html += `<textarea id="rw" rows="6">${esc(r.rewrite || "")}</textarea><div class="row"><button class="btn btn-ghost" id="copy-rw">Copy rewrite</button>`;
     if (lastCheckId) html += `<button class="btn btn-ghost" id="dl-report">Download report</button>`;
@@ -62,6 +63,7 @@
     if (!text) { flash("Enter some text first"); return; }
     $("upgrade-banner").hidden = true;
     $("check").disabled = true; $("check").textContent = "Checking...";
+    $("results").innerHTML = '<div class="empty">Checking your post... (the first check after a quiet spell can take up to a minute while the server wakes)</div>';
     try {
       const data = await api("POST", "/api/check", { text, platform: $("platform").value, brandProfileId: $("profile").value || undefined });
       renderResult(data.result, data.checkId);
