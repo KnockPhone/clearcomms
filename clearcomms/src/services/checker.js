@@ -45,6 +45,15 @@ async function checkText({ text, platform, brandProfile, useClaude = true } = {}
       base.aiError = (e && e.message) || "AI unavailable";
     }
   }
+  // Score the suggested rewrite so the improvement is visible.
+  if (base.rewrite) {
+    try {
+      const rw = engine.analyze(base.rewrite, { platform, brandProfile });
+      base.rewriteScore = rw.score;
+      base.rewriteBand = rw.band;
+      base.rewriteReadingAge = rw.readingAge;
+    } catch (_) { /* ignore */ }
+  }
   return base;
 }
 
