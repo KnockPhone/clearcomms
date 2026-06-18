@@ -15,4 +15,13 @@ db.pragma("foreign_keys = ON");
 const schema = fs.readFileSync(path.join(__dirname, "schema.sql"), "utf8");
 db.exec(schema);
 
+// Additive column migrations. CREATE TABLE IF NOT EXISTS cannot add columns to
+// a table that already exists, so new columns are added here, guarded so the
+// migration is safe to run on every boot.
+function addColumnIfMissing(table, column, ddl) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((c) => c.name === column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+}
+addColumnIfMissing("users", "status", "status TEXT NOT NULL DEFAULT 'active'");
+
 module.exports = db;

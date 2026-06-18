@@ -92,9 +92,78 @@ function getAppSettings() { return selSettings.get(); }
 function setAnthropicKey(enc, model) { upsertSettings.run(enc, model || null); }
 function clearAnthropicKey() { upsertSettings.run(null, null); }
 
+// ---- Admin (platform-wide management) ----
+const selFirstUser = db.prepare("SELECT * FROM users ORDER BY created_at ASC, rowid ASC LIMIT 1");
+const updUserStatus = db.prepare("UPDATE users SET status = ? WHERE id = ?");
+const updUserRole = db.prepare("UPDATE users SET role = ? WHERE id = ?");
+const delUserSessions = db.prepare("DELETE FROM sessions WHERE user_id = ?");
+const delUserChecks = db.prepare("DELETE FROM checks WHERE user_id = ?");
+const delUserRow = db.prepare("DELETE FROM users WHERE id = ?");
+const countOrgUsers = db.prepare("SELECT COUNT(*) AS n FROM users WHERE org_id = ?");
+const updOrgPlan = db.prepare("UPDATE orgs SET plan = ?, subscription_status = ? WHERE id = ?");
+
+function getFirstUser() { return selFirstUser.get(); }
+function setUserStatus(id, status) { return updUserStatus.run(status, id).changes > 0; }
+function setUserRole(id, role) { return updUserRole.run(role, id).changes > 0; }
+
+// Remove a single user and everything that references them. Wrapped in a
+// transaction so an interrupted delete cannot leave half-removed rows.
+const deleteUser = db.transaction((id) => {
+  delUserSessions.run(id);
+  delUserChecks.run(id);
+  return delUserRow.run(id).changes > 0;
+});
+
+// Remove an organisation and every user, check, profile and session under it.
+const deleteOrgCascade = db.transaction((orgId) => {
+  const users = db.prepare("SELECT id FROM users WHERE org_id = ?").all(orgId);
+  for (const u of users) { delUserSessions.run(u.id); }
+  db.prepare("DELETE FROM checks WHERE org_id = ?").run(orgId);
+  db.prepare("DELETE FROM brand_profiles WHERE org_id = ?").run(orgId);
+  db.prepare("DELETE FROM users WHERE org_id = ?").run(orgId);
+  return db.prepare("DELETE FROM orgs WHERE id = ?").run(orgId).changes > 0;
+});
+
+function setOrgPlan(orgId, plan, status) { return updOrgPlan.run(plan, status, orgId).changes > 0; }
+function countUsersInOrg(orgId) { return countOrgUsers.get(orgId).n; }
+
+function listAllUsers() {
+  return db.prepare(
+    "SELECT u.id, u.email, u.role, u.status, u.created_at, u.org_id, o.name AS org_name, o.plan, " +
+    "(SELECT COUNT(*) FROM checks c WHERE c.user_id = u.id) AS checks " +
+    "FROM users u JOIN orgs o ON o.id = u.org_id ORDER BY u.created_at DESC"
+  ).all();
+}
+
+function listOrgsWithStats() {
+  return db.prepare(
+    "SELECT o.id, o.name, o.plan, o.subscription_status, o.created_at, " +
+    "(SELECT COUNT(*) FROM users u WHERE u.org_id = o.id) AS users, " +
+    "(SELECT COUNT(*) FROM checks c WHERE c.org_id = o.id) AS checks, " +
+    "(SELECT MAX(c.created_at) FROM checks c WHERE c.org_id = o.id) AS last_check " +
+    "FROM orgs o ORDER BY o.created_at DESC"
+  ).all();
+}
+
+function platformStats() {
+  const one = (sql) => db.prepare(sql).get().n;
+  return {
+    orgs: one("SELECT COUNT(*) AS n FROM orgs"),
+    users: one("SELECT COUNT(*) AS n FROM users"),
+    suspended: one("SELECT COUNT(*) AS n FROM users WHERE status = 'suspended'"),
+    checks: one("SELECT COUNT(*) AS n FROM checks"),
+    checksThisMonth: one("SELECT COUNT(*) AS n FROM checks WHERE created_at >= datetime('now','start of month')"),
+    aiChecks: one("SELECT COUNT(*) AS n FROM checks WHERE ai_used = 1"),
+    proOrgs: one("SELECT COUNT(*) AS n FROM orgs WHERE plan = 'pro'"),
+    signups7d: one("SELECT COUNT(*) AS n FROM users WHERE created_at >= datetime('now','-7 days')"),
+  };
+}
+
 module.exports = {
   createOrg, getOrg, getOrgByCustomer, setOrgCustomer, setOrgSubscription,
   createUser, getUserByEmail, getUserById,
+  getFirstUser, setUserStatus, setUserRole, deleteUser, deleteOrgCascade,
+  setOrgPlan, countUsersInOrg, listAllUsers, listOrgsWithStats, platformStats,
   createSession, getSession, deleteSession, purgeSessions,
   createBrandProfile, listBrandProfiles, getBrandProfile, deleteBrandProfile,
   createCheck, listChecks, getCheck, countChecksThisMonth,
