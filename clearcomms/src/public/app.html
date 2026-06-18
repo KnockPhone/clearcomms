@@ -9,39 +9,45 @@
 <body>
 <a class="skip" href="#draft">Skip to the editor</a>
 <header class="topbar">
-  <a class="brand" href="/app"><span class="mark" aria-hidden="true">C</span> ClearComms</a>
+  <a class="brand" href="/app"><span class="mark" aria-hidden="true"></span>ClearComms</a>
   <div class="spacer"></div>
   <span class="chip-pill" id="usage" aria-live="polite"></span>
   <span class="who" id="who"></span>
-  <button class="btn btn-primary" id="upgrade" hidden>Upgrade</button>
-  <button class="btn btn-ghost" id="manage" hidden>Billing</button>
-  <a class="btn btn-ghost" id="admin-link" href="/admin" hidden>Admin</a>
-  <button class="btn btn-ghost" id="settings-btn">Settings</button>
-  <button class="btn btn-ghost" id="logout">Log out</button>
+  <button class="btn btn-primary btn-sm" id="upgrade" hidden>Upgrade</button>
+  <button class="btn btn-ghost btn-sm" id="manage" hidden>Billing</button>
+  <a class="btn btn-ghost btn-sm" id="admin-link" href="/admin" hidden>Admin</a>
+  <button class="btn btn-ghost btn-sm" id="settings-btn">Settings</button>
+  <button class="btn btn-ghost btn-sm" id="logout">Log out</button>
 </header>
 
-<main class="wrap">
+<main class="wrap app-main">
+  <div class="titlebar">
+    <h1>Your draft</h1>
+    <div class="meta">Plain &middot; kind &middot; accessible</div>
+  </div>
+
   <div id="upgrade-banner" class="banner" hidden></div>
 
   <div class="appgrid">
     <section class="panel" aria-label="Editor">
-      <h2>Your draft</h2>
-      <label for="draft">Post text</label>
-      <textarea id="draft" rows="9" placeholder="Paste a social post or short piece of content here..."></textarea>
-      <div class="row">
-        <div>
-          <label for="platform">Platform</label>
-          <select id="platform"><option>LinkedIn</option><option>X</option><option>Instagram</option><option>Facebook</option></select>
-        </div>
+      <h2>Editor</h2>
+      <div class="field-row"><label for="draft" style="margin:0">Post text</label><span class="count" id="count">0 characters</span></div>
+      <textarea id="draft" rows="8" placeholder="Paste a social post or short piece of content here..."></textarea>
+      <div class="platforms" id="platforms" role="tablist" aria-label="Platform">
+        <button type="button" data-platform="LinkedIn" class="on" aria-selected="true">LinkedIn</button>
+        <button type="button" data-platform="X" aria-selected="false">X</button>
+        <button type="button" data-platform="Instagram" aria-selected="false">Instagram</button>
+        <button type="button" data-platform="Facebook" aria-selected="false">Facebook</button>
+      </div>
+      <div class="editor-foot">
         <div class="grow">
           <label for="profile">Brand profile</label>
           <select id="profile"><option value="">None</option></select>
         </div>
-        <button class="btn btn-primary btn-lg" id="check">Check post</button>
-        <span class="count" id="count">0 characters</span>
+        <button class="btn btn-dark" id="check">Check post <span class="ar">&rarr;</span></button>
       </div>
       <div class="chips">
-        <span class="lbl">Try an example:</span>
+        <span class="lbl">Try an example</span>
         <button class="chip" data-sample="0" type="button">Mental health</button>
         <button class="chip" data-sample="1" type="button">Stop smoking</button>
         <button class="chip" data-sample="2" type="button">Sexual health</button>
@@ -50,37 +56,78 @@
 
     <section class="panel" aria-label="Results">
       <h2>Results</h2>
-      <div id="results" aria-live="polite"><div class="empty"><span class="big" aria-hidden="true">&#9678;</span>Paste a draft on the left and select Check post.</div></div>
+      <div id="results" aria-live="polite"><div class="empty"><span class="big" aria-hidden="true">&deg;</span>Paste a draft on the left and select Check post.</div></div>
     </section>
   </div>
 
-  <section class="panel method-card" aria-label="Why ClearComms rewrites this way">
+  <!-- ALT TEXT GENERATOR -->
+  <section class="alt-wrap" aria-label="Image alt text">
+    <div class="alt-head">
+      <div>
+        <h2>Image alt text</h2>
+        <p>Drop in a campaign image and get accessible alt text and a caption, ready to paste.</p>
+      </div>
+      <span class="aiflag off" id="alt-aiflag" hidden>Needs AI on</span>
+    </div>
+    <div class="alt-body">
+      <div class="alt-drop">
+        <label for="alt-file" class="dropzone" id="alt-dropzone">
+          <span class="di" aria-hidden="true">&#9650;</span>
+          <span id="alt-droptext">Choose or drop an image</span>
+          <img id="alt-preview" alt="" hidden>
+        </label>
+        <input id="alt-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+        <button class="btn btn-primary btn-sm" id="alt-gen" style="width:100%;margin-top:14px" disabled>Generate alt text</button>
+        <p class="error" id="alt-error" role="alert" aria-live="polite"></p>
+      </div>
+      <div class="alt-out">
+        <div id="alt-empty" class="alt-placeholder">Your alt text and caption will appear here. Always read them back against the image before publishing.</div>
+        <div id="alt-result" hidden>
+          <div class="alt-field">
+            <span class="cap">Alt text</span>
+            <div class="val" id="alt-alt"></div>
+            <button class="btn btn-ghost btn-sm" id="alt-copy-alt" style="margin-top:10px">Copy alt text</button>
+          </div>
+          <div class="alt-field">
+            <span class="cap">Suggested caption</span>
+            <div class="val serif" id="alt-caption"></div>
+            <button class="btn btn-ghost btn-sm" id="alt-copy-cap" style="margin-top:10px">Copy caption</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section class="method-card" aria-label="Why ClearComms rewrites this way">
     <details>
       <summary><span class="method-eyebrow">Our method</span> Why ClearComms rewrites the way it does</summary>
       <div class="method-body">
         <p class="muted">Every suggestion follows the same five principles, so the rewrite is consistent and you can explain any change to a colleague or client.</p>
         <div class="method-grid">
-          <div class="method-item"><b>1. Plain English, reading age 9 to 11</b><p>Most people read more comfortably below their top reading level, especially on a phone. We aim low so the message lands first time. This mirrors long-standing plain-English guidance used across the NHS and GOV.UK.</p></div>
+          <div class="method-item"><b>1. Plain English, reading age 9 to 11</b><p>Most people read more comfortably below their top reading level, especially on a phone. We aim low so the message lands first time, mirroring plain-English guidance used across the NHS and GOV.UK.</p></div>
           <div class="method-item"><b>2. Short sentences, everyday words</b><p>We split long sentences and swap officialese for plain words. This helps people with lower literacy, readers using English as an additional language, and anyone skim-reading.</p></div>
-          <div class="method-item"><b>3. People-first, non-stigmatising language</b><p>We name the person before the condition and avoid blame words. This draws on inclusive-language guidance from groups such as Mind, disability organisations, and the Samaritans media guidelines on suicide.</p></div>
-          <div class="method-item"><b>4. Accessible by default</b><p>CamelCase hashtags and meaningful link text so screen readers make sense of them, sentence case rather than block capitals, emoji used sparingly at the end, and a prompt to add image alt text. This aligns with WCAG and platform accessibility guidance.</p></div>
-          <div class="method-item"><b>5. Calm punctuation</b><p>We avoid shouting in capitals and we never use em dashes, choosing commas, brackets or a fresh sentence instead. Calmer punctuation reads better aloud and feels more trustworthy.</p></div>
+          <div class="method-item"><b>3. People-first, non-stigmatising</b><p>We name the person before the condition and avoid blame words, drawing on guidance from groups such as Mind, disability organisations, and the Samaritans media guidelines.</p></div>
+          <div class="method-item"><b>4. Accessible by default</b><p>CamelCase hashtags, meaningful link text, sentence case rather than block capitals, sparing emoji, and a prompt to add image alt text, in line with WCAG.</p></div>
+          <div class="method-item"><b>5. Calm punctuation</b><p>We avoid shouting in capitals and never use em dashes, choosing commas, brackets or a fresh sentence instead. Calmer punctuation reads better aloud.</p></div>
         </div>
         <p class="method-foot">ClearComms is assistive. It speeds up the first draft of a review, but a person should always have the final say before publishing.</p>
       </div>
     </details>
   </section>
 
-  <div class="appgrid">
-    <section class="panel" aria-label="Recent checks">
+  <div class="lower-grid">
+    <section aria-label="Recent checks">
       <h2>Recent checks</h2>
+      <p class="sub">Your latest reviews.</p>
       <ul class="list" id="history"></ul>
     </section>
 
-    <section class="panel" aria-label="Brand profiles">
+    <section aria-label="Brand profiles">
       <h2>Brand profiles</h2>
+      <p class="sub">House style, applied on every check.</p>
       <ul class="list" id="profiles-list"></ul>
-      <form id="bp-form" style="margin-top:10px">
+      <form id="bp-form" class="profile-form" style="margin-top:14px">
         <label for="bp-name">Name</label>
         <input id="bp-name" required placeholder="e.g. Council main channel">
         <label for="bp-tone">Tone notes (optional)</label>
@@ -90,7 +137,7 @@
         <label for="bp-age">Reading age target (optional)</label>
         <input id="bp-age" type="number" min="5" max="18" placeholder="11">
         <p class="error" id="bp-error" role="alert" aria-live="polite"></p>
-        <button class="btn btn-ghost" type="submit" style="margin-top:10px">Add profile</button>
+        <button class="btn btn-ghost btn-sm" type="submit" style="margin-top:14px">Add profile</button>
       </form>
     </section>
   </div>
@@ -99,8 +146,8 @@
 </main>
 
 <dialog id="setup-dialog" aria-labelledby="setup-title">
-  <h2 id="setup-title" style="margin:0 0 4px;font-size:21px">Connect Claude</h2>
-  <p class="muted" style="margin:0 0 14px;font-size:14px">Paste your Anthropic API key to switch on AI-powered checks and natural rewrites. It is stored encrypted on your own server and is never shown again. Without it, ClearComms still runs on the built-in rules.</p>
+  <h2 id="setup-title">Connect Claude</h2>
+  <p class="muted" style="margin:0 0 14px;font-size:14px">Paste your Anthropic API key to switch on AI-powered checks, natural rewrites and image alt text. It is stored encrypted on your own server and is never shown again. Without it, ClearComms still runs on the built-in rules.</p>
   <form id="setup-form">
     <label for="set-key">Anthropic API key</label>
     <input id="set-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
@@ -111,9 +158,9 @@
       <option value="claude-opus-4-8">Claude Opus 4.8 (most capable)</option>
     </select>
     <p class="error" id="set-error" role="alert" aria-live="polite"></p>
-    <div class="row" style="margin-top:10px">
-      <button class="btn btn-primary" type="submit">Save and turn on AI</button>
-      <button class="btn btn-ghost" type="button" id="setup-skip">Not now</button>
+    <div class="rewrite-row" style="margin-top:14px;display:flex;gap:12px">
+      <button class="btn btn-primary btn-sm" type="submit">Save and turn on AI</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="setup-skip">Not now</button>
     </div>
     <p class="muted" id="set-envnote" style="font-size:12.5px;margin-top:12px" hidden>A key is already configured on the server, so this is managed there.</p>
   </form>

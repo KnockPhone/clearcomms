@@ -9,28 +9,28 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
-  <a class="brand" href="/app"><span class="mark" aria-hidden="true">C</span> ClearComms</a>
+  <a class="brand" href="/app"><span class="mark" aria-hidden="true"></span>ClearComms</a>
   <span class="chip-pill">Admin</span>
   <div class="spacer"></div>
   <span class="who" id="who"></span>
-  <a class="btn btn-ghost" href="/app">Back to app</a>
-  <button class="btn btn-ghost" id="logout">Log out</button>
+  <a class="btn btn-ghost btn-sm" href="/app">Back to app</a>
+  <button class="btn btn-ghost btn-sm" id="logout">Log out</button>
 </header>
 
 <main class="wrap" id="main">
   <div class="admin-head">
     <div>
       <h1 class="admin-title">Platform admin</h1>
-      <p class="muted" id="admin-sub">Manage every organisation and person using ClearComms.</p>
+      <p class="muted" id="admin-sub" style="margin:6px 0 0">Manage every organisation and person using ClearComms.</p>
     </div>
-    <button class="btn btn-ghost" id="refresh" type="button">Refresh</button>
+    <button class="btn btn-ghost btn-sm" id="refresh" type="button">Refresh</button>
   </div>
 
   <section aria-label="Headline numbers">
     <div class="stat-grid" id="stats"></div>
   </section>
 
-  <section class="panel" aria-label="Organisations" style="margin-top:20px">
+  <section class="admin-section" aria-label="Organisations">
     <h2>Organisations <span class="n" id="org-count"></span></h2>
     <div class="table-wrap">
       <table class="tbl" id="org-table">
@@ -40,11 +40,9 @@
     </div>
   </section>
 
-  <section class="panel" aria-label="People" style="margin-top:20px">
+  <section class="admin-section" aria-label="People">
     <h2>People <span class="n" id="user-count"></span></h2>
-    <div class="row" style="margin:0 0 6px">
-      <input id="user-search" placeholder="Search by email or organisation" style="max-width:340px" aria-label="Search people">
-    </div>
+    <div style="margin:0 0 12px"><input id="user-search" placeholder="Search by email or organisation" aria-label="Search people"></div>
     <div class="table-wrap">
       <table class="tbl" id="user-table">
         <thead><tr><th>Email</th><th>Organisation</th><th>Role</th><th>Status</th><th>Checks</th><th>Joined</th><th class="ar">Actions</th></tr></thead>
