@@ -43,13 +43,14 @@ function endSession(req, res) {
 }
 
 // Attaches req.user and req.org when a valid session cookie is present.
+// A suspended user is treated as signed out until the administrator reactivates them.
 function attachUser(req, _res, next) {
   const token = req.cookies && req.cookies[COOKIE];
   if (token) {
     const s = repo.getSession(hashToken(token));
     if (s && new Date(s.expires_at) > new Date()) {
       const user = repo.getUserById(s.user_id);
-      if (user) { req.user = user; req.org = repo.getOrg(user.org_id); }
+      if (user && user.status !== "suspended") { req.user = user; req.org = repo.getOrg(user.org_id); }
     }
   }
   next();
@@ -60,4 +61,20 @@ function requireAuth(req, res, next) {
   next();
 }
 
-module.exports = { hashPassword, verifyPassword, startSession, endSession, attachUser, requireAuth, COOKIE };
+// The platform administrator is either the configured SUPER_ADMIN_EMAIL or,
+// when none is set, the very first account that signed up. This keeps a fresh
+// install zero-config while still letting an operator pin the admin by email.
+function isPlatformAdmin(user) {
+  if (!user) return false;
+  if (config.superAdminEmail) return String(user.email).toLowerCase() === config.superAdminEmail;
+  const first = repo.getFirstUser();
+  return !!(first && first.id === user.id);
+}
+
+function requireAdmin(req, res, next) {
+  if (!req.user) return res.status(401).json({ error: "Please sign in." });
+  if (!isPlatformAdmin(req.user)) return res.status(403).json({ error: "Admin access only." });
+  next();
+}
+
+module.exports = { hashPassword, verifyPassword, startSession, endSession, attachUser, requireAuth, isPlatformAdmin, requireAdmin, COOKIE };
