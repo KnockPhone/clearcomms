@@ -77,6 +77,8 @@ function deterministicRewrite(text) {
   out = out.replace(/\b[A-Z][A-Z'&]{2,}\b/g, (w) => (ACRONYM_SET.has(w.replace(/[^A-Z]/g, "")) ? w : w.toLowerCase()));
   out = out.replace(/!{2,}/g, "!");
   out = out.replace(/(\p{Extended_Pictographic})\1+/gu, "$1");
+  out = out.replace(/\s*—\s*/g, ", ");   // never output em dashes
+  out = out.replace(/ – /g, ", ");          // spaced en dash as punctuation
   out = out.replace(/\b([Aa])n\s+(?=[bcdfghjklmnpqrstvwxyz])/g, "$1 ");
   out = out.replace(/\b([Aa])\s+(?=[aeio])/g, "$1n ");
   // Re-capitalise the first letter of each sentence after the de-shout pass.

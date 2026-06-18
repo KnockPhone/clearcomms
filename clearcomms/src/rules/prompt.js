@@ -23,7 +23,7 @@ function buildSystemPrompt(brandProfile) {
     renderForPrompt(),
     brandBlock,
     "TASK: Review the user's draft. Return a fluent rewrite and your findings.",
-    "Rewrite rules: preserve the meaning and every fact, do not invent claims or statistics, aim for a reading age of 9 to 11, use plain English, keep it close to the original length, make it accessible (CamelCase multi-word hashtags, at most one or two emoji at the end, no shouting in capitals, meaningful link text), and non-stigmatising. If a passage is already good, keep it.",
+    "Rewrite rules: preserve the meaning and every fact, do not invent claims or statistics, aim for a reading age of 9 to 11, use plain English, keep it close to the original length, make it accessible (CamelCase multi-word hashtags, at most one or two emoji at the end, no shouting in capitals, meaningful link text), and non-stigmatising. Never use em dashes or en dashes; use commas, brackets, or split the sentence instead. If a passage is already good, keep it. Aim for a rewrite that would score 90 or above for clarity, accessibility and inclusive language: keep most sentences under 20 words, use everyday words, put at most one emoji at the very end, and remove anything stigmatising.",
     "",
     "Respond with ONLY a JSON object, no surrounding text, in exactly this shape:",
     "{",
